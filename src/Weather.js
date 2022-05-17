@@ -49,9 +49,6 @@ export default function Weather() {
             <img src={weather.icon} alt="Weather Icon" />
           </li>
         </ul>
-        <br />
-        <a href="https://github.com/cbrown297/weather-react" target="_blank" rel="noreferrer">Open source code</a>
-        <p className="github"> by Claudia Brown</p>
       </div>
     );
   } else {
