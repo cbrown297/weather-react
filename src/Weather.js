@@ -1,25 +1,22 @@
-import React from "react";
+import React, {useState} from "react";
 import axios from "axios";
 import './Weather.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function Weather(props) {
+export default function Weather() {
+  const [loaded, setLoaded] = useState(false);
+  const [weather, setWeather] = useState(null);
+  const [city, setCity] = useState("");
 
   function showTemperature(response) {
     console.log(response.data);
-  }
-  
-  function handleSubmit(event) {
-    event.preventDefault();
-    let apiKey = `cfdab66ad524dca3797a910286a0542f`;
-    let unit = `imperial`;
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=${props.city}&appid=${apiKey}&units=${unit}`;
-    axios.get(url).then(showTemperature);
+    setLoaded(true);
   }
 
+  if (loaded) {
   return (
   <div className="Weather">
-    <form className="search-engine" onSubmit={handleSubmit}>
+    <form className="search-engine">
       <div className="row">
         <div className="col-9">
           <input 
@@ -40,18 +37,18 @@ export default function Weather(props) {
     <h1>New York</h1>
     <ul>
       <li>Wednesday 7:00</li>
-      <li>Mostly Cloudy</li>
+      <li>{weather.description}</li>
     </ul>
     <div className="row mt-3">
       <div className="col-6">
         <div className="clearfix">
           <img 
-          src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png" 
+          src="{weather.icon}" 
           alt="Mostly Cloudy"
           className="float-left"
           />
           <span className="float-left">
-            <span className="temperature">6</span>
+            <span className="temperature">{}</span>
             <span className="unit">°C</span>  
           </span>
         </div>
@@ -59,13 +56,22 @@ export default function Weather(props) {
       <div className="col-6">
         <ul>
           <li>Precipitation: 15%</li>
-          <li>Humidity: 72%</li>
-          <li>Wind: 3mph</li>
+          <li>Humidity: %</li>
+          <li>Wind: mph</li>
         </ul>
       </div>
     </div>
   </div>
-  );
+  );  
+  } else {
+      const units = "imperial";
+      const apiKey = "cfdab66ad524dca3797a910286a0542f";
+      let city = "New York";
+      let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`;
+      axios.get(url).then(showTemperature);
+
+      return "Loading";
+  }
 }
 
 
