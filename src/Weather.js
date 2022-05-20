@@ -1,12 +1,25 @@
-import React, {useState} from "react";
+import React from "react";
 import axios from "axios";
 import './Weather.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function Weather() {
+export default function Weather(props) {
+
+  function showTemperature(response) {
+    console.log(response.data);
+  }
+  
+  function handleSubmit(event) {
+    event.preventDefault();
+    let apiKey = `cfdab66ad524dca3797a910286a0542f`;
+    let unit = `imperial`;
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=${props.city}&appid=${apiKey}&units=${unit}`;
+    axios.get(url).then(showTemperature);
+  }
+
   return (
   <div className="Weather">
-    <form className="search-engine">
+    <form className="search-engine" onSubmit={handleSubmit}>
       <div className="row">
         <div className="col-9">
           <input 
