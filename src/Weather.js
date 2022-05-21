@@ -3,17 +3,26 @@ import axios from "axios";
 import './Weather.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function Weather() {
-  const [loaded, setLoaded] = useState(false);
-  const [weather, setWeather] = useState(null);
-  const [city, setCity] = useState("");
+export default function Weather(props) {
+  const [weather, setWeather] = useState({loaded: false});
 
   function showTemperature(response) {
-    console.log(response.data);
-    setLoaded(true);
+    setWeather(
+      {
+        loaded: true,
+        city: response.data.name,
+        date: "Wednesday 7:00",
+        temperature: Math.round(response.data.main.temp),
+        humidity: response.data.main.humidity,
+        wind: Math.round(response.data.wind.speed),
+        description: response.data.weather[0].description,
+        icon: `http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`,
+        alt: response.data.weather[0].main
+      }
+    )
   }
 
-  if (loaded) {
+  if (weather.loaded) {
   return (
   <div className="Weather">
     <form className="search-engine">
@@ -34,21 +43,21 @@ export default function Weather() {
         </div>
       </div>
     </form>
-    <h1>New York</h1>
+    <h1>{weather.city}</h1>
     <ul>
-      <li>Wednesday 7:00</li>
-      <li>{weather.description}</li>
+      <li>{weather.date}</li>
+      <li className="text-capitalize">{weather.description}</li>
     </ul>
     <div className="row mt-3">
       <div className="col-6">
         <div className="clearfix">
           <img 
-          src="{weather.icon}" 
-          alt="Mostly Cloudy"
+          src={weather.icon} 
+          alt={weather.alt}
           className="float-left"
           />
           <span className="float-left">
-            <span className="temperature">{}</span>
+            <span className="temperature">{weather.temperature}</span>
             <span className="unit">°C</span>  
           </span>
         </div>
@@ -56,8 +65,8 @@ export default function Weather() {
       <div className="col-6">
         <ul>
           <li>Precipitation: 15%</li>
-          <li>Humidity: %</li>
-          <li>Wind: mph</li>
+          <li>Humidity: {weather.humidity}%</li>
+          <li>Wind: {weather.wind}mph</li>
         </ul>
       </div>
     </div>
@@ -66,11 +75,10 @@ export default function Weather() {
   } else {
       const units = "imperial";
       const apiKey = "cfdab66ad524dca3797a910286a0542f";
-      let city = "New York";
-      let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`;
-      axios.get(url).then(showTemperature);
+      let url = `https://api.openweathermap.org/data/2.5/weather?q=${props.defaultCity}&appid=${apiKey}&units=${units}`;
+      axios.get(url).then(showTemperature); 
 
-      return "Loading";
+      return "Loading...";
   }
 }
 
