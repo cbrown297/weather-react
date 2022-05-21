@@ -1,11 +1,12 @@
 import React, {useState} from "react";
 import axios from "axios";
 import './Weather.css';
-import FormattedDate from "./FormattedDate";
+import WeatherData from "./WeatherData";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Weather(props) {
   const [weather, setWeather] = useState({loaded: false});
+  const [city, setCity] = useState(props.defaultCity);
 
   function showTemperature(response) {
     setWeather(
@@ -22,17 +23,34 @@ export default function Weather(props) {
       }
     )
   }
+  
+  function search() {
+    const units = "imperial";
+    const apiKey = "cfdab66ad524dca3797a910286a0542f";
+    let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`;
+    axios.get(url).then(showTemperature); 
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    search();
+  }
+
+  function handleCityChange(event) {
+    setCity(event.target.value);
+  }
 
   if (weather.loaded) {
   return (
   <div className="Weather">
-    <form className="search-engine">
+    <form className="search-engine" onSubmit={handleSubmit}>
       <div className="row">
         <div className="col-9">
           <input 
             type="search" 
             placeholder="Enter a city..." 
             className="form-control"
+            onChange={handleCityChange}
           />
         </div>
         <div className="col-3">
@@ -44,102 +62,11 @@ export default function Weather(props) {
         </div>
       </div>
     </form>
-    <h1>{weather.city}</h1>
-    <ul>
-      <li><FormattedDate date={weather.date}/></li>
-      <li className="text-capitalize">{weather.description}</li>
-    </ul>
-    <div className="row mt-3">
-      <div className="col-6">
-        <div className="clearfix">
-          <img 
-          src={weather.icon} 
-          alt={weather.alt}
-          className="float-left"
-          />
-          <span className="float-left">
-            <span className="temperature">{weather.temperature}</span>
-            <span className="unit">°C</span>  
-          </span>
-        </div>
-      </div>
-      <div className="col-6">
-        <ul>
-          <li>Precipitation: 15%</li>
-          <li>Humidity: {weather.humidity}%</li>
-          <li>Wind: {weather.wind}mph</li>
-        </ul>
-      </div>
-    </div>
+    <WeatherData data={weather}/>
   </div>
   );  
   } else {
-      const units = "imperial";
-      const apiKey = "cfdab66ad524dca3797a910286a0542f";
-      let url = `https://api.openweathermap.org/data/2.5/weather?q=${props.defaultCity}&appid=${apiKey}&units=${units}`;
-      axios.get(url).then(showTemperature); 
-
-      return "Loading...";
+    search();
+    return "Loading...";
   }
 }
-
-
-
-
-
-
-
-
-
-  /* const [city, setCity] = useState("");
-  const [weather, setWeather] = useState(null);
-  const [loaded, setLoaded] = useState(false);
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    let units = `imperial`;
-    let apiKey = `cfdab66ad524dca3797a910286a0542f`;
-    let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`;
-    axios.get(url).then(showTemperature);
-  }
-
-  function showTemperature(response) {
-    setLoaded(true);
-    setWeather({
-      temperature: Math.round(response.data.main.temp),
-      humidity: response.data.main.humidity,
-      wind: Math.round(response.data.wind.speed),
-      icon: `http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`,
-      description: response.data.weather[0].description
-    });
-  }
-
-  function updateCity(event) {
-    setCity(event.target.value);
-  }
-
-  let form = (
-    <form onSubmit={handleSubmit} className="search-engine">
-      <input type="search" placeholder="Enter a city" onChange={updateCity} />
-      <button type="Submit">Search</button>
-    </form>
-  );
-
-  if (loaded) {
-    return (
-      <div className="Weather">
-        {form}
-        <ul>
-          <li>Temperature: {weather.temperature}°F</li>
-          <li>Description: {weather.description}</li>
-          <li>Humidity: {weather.humidity}%</li>
-          <li>Wind: {weather.wind}mph</li>
-          <li>
-            <img src={weather.icon} alt="Weather Icon" />
-          </li>
-        </ul>
-      </div>
-    );
-  } else {
-    return form;
-  }*/
